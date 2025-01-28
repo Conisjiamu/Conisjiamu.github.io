@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Rocks with Multiple PNGs</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-image: url('./水晶游乐场背景.png'); /* 背景图片 */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .crystal {
+      position: absolute;
+      top: 70px; /* 距离顶部：20px + 50px */
+      right: 70px; /* 距离右侧：20px + 50px */
+      width: 225px; /* 放大 50%，原宽度 150px x 1.5 = 225px */
+      height: auto; /* 等比例放大 */
+      animation: rotate 4s linear infinite; /* 添加旋转动画 */
+      transform-origin: center; /* 设置旋转中心为自身中心 */
+    }
+
+    /* 定义旋转动画 */
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 将图片作为链接 -->
+  <a href="1.卡牌.html" target="_self"> <!-- 替换 nextPage.html 为目标网页路径 -->
+    <img src="./水晶旋转.png" alt="Crystal" class="crystal">
+  </a>
+
+  <script>
+    // Matter.js 配置代码（保持不变）
+    const { Engine, Render, Runner, World, Bodies, Mouse, MouseConstraint, Composite } = Matter;
+
+    const engine = Engine.create();
+    const world = engine.world;
+
+    const render = Render.create({
+      element: document.body,
+      engine: engine,
+      options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false,
+        background: 'transparent' // 背景透明
+      }
+    });
+    Render.run(render);
+
+    const runner = Runner.create();
+    Runner.run(runner, engine);
+
+    const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 20, window.innerWidth, 40, {
+      isStatic: true,
+      render: {
+        fillStyle: '#654321'
+      }
+    });
+
+    const leftWall = Bodies.rectangle(-20, window.innerHeight / 2, 40, window.innerHeight, {
+      isStatic: true,
+      render: {
+        fillStyle: '#654321'
+      }
+    });
+
+    const rightWall = Bodies.rectangle(window.innerWidth + 20, window.innerHeight / 2, 40, window.innerHeight, {
+      isStatic: true,
+      render: {
+        fillStyle: '#654321'
+      }
+    });
+
+    World.add(world, [ground, leftWall, rightWall]);
+
+    const rockImages = [
+      'rock1.png', 'rock2.png', 'rock3.png', 'rock4.png', 'rock5.png',
+      'rock6.png', 'rock7.png', 'rock8.png', 'rock9.png', 'rock10.png',
+      'rock11.png', 'rock12.png', 'rock13.png', 'rock14.png', 'rock15.png',
+      'rock16.png', 'rock17.png'
+    ];
+
+    function createRock(x, y, imagePath) {
+      return Bodies.rectangle(x, y, 60, 60, {
+        restitution: 0.56,
+        density: 0.01,
+        friction: 0.1,
+        render: {
+          sprite: {
+            texture: imagePath,
+            xScale: 0.3,
+            yScale: 0.3
+          }
+        }
+      });
+    }
+
+    const rocks = [];
+    for (let i = 0; i < rockImages.length; i++) {
+      const rock = createRock(
+        Math.random() * window.innerWidth, 
+        Math.random() * -500, 
+        rockImages[i]
+      );
+      rocks.push(rock);
+      World.add(world, rock);
+    }
+
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse: mouse,
+      constraint: {
+        stiffness: 0.2,
+        render: {
+          visible: false
+        }
+      }
+    });
+    World.add(world, mouseConstraint);
+
+    window.addEventListener('resize', () => {
+      render.canvas.width = window.innerWidth;
+      render.canvas.height = window.innerHeight;
+
+      Matter.Body.setPosition(ground, {
+        x: window.innerWidth / 2,
+        y: window.innerHeight + 20
+      });
+      Matter.Body.setPosition(leftWall, {
+        x: -20,
+        y: window.innerHeight / 2
+      });
+      Matter.Body.setPosition(rightWall, {
+        x: window.innerWidth + 20,
+        y: window.innerHeight / 2
+      });
+    });
+  </script>
+</body>
+</html>
+
